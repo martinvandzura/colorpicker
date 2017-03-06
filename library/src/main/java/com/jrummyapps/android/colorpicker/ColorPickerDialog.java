@@ -502,6 +502,10 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         adapter = new ColorPaletteAdapter(new ColorPaletteAdapter.OnColorSelectedListener() {
             @Override
             public void onColorSelected(int newColor) {
+                if(showSelectButton == false){
+                    color = newColor;
+                }
+
                 if (color == newColor) {
                     colorPickerDialogListener.onColorSelected(dialogId, color);
                     dismiss();
