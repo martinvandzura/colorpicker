@@ -85,6 +85,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
     private static final String ARG_NEUTRAL_CUSTOM_TITLE = "neutralCustomTitle";
     private static final String ARG_SHOW_SELECT = "showSelect";
     private static final String ARG_CONTENT_MESSAGE = "contentMessage";
+    private static final String ARG_ACTION_BUTTONS_COLOR = "actionButtonsColor";
 
     public static final int TYPE_CUSTOM = 0;
     public static final int TYPE_PRESETS = 1;
@@ -160,6 +161,9 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
     @StringRes
     int contentMessage;
 
+    @ColorInt
+    int actionButtonsColor;
+
     TextView conntentMessageView;
 
     boolean showSelectButton;
@@ -192,6 +196,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         neutralCustomTitle = getArguments().getInt(ARG_NEUTRAL_CUSTOM_TITLE);
         showSelectButton = getArguments().getBoolean(ARG_SHOW_SELECT);
         contentMessage = getArguments().getInt(ARG_CONTENT_MESSAGE);
+        actionButtonsColor = getArguments().getInt(ARG_ACTION_BUTTONS_COLOR);
 
         rootView = new FrameLayout(getActivity());
         if (dialogType == TYPE_CUSTOM) {
@@ -288,6 +293,23 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
                     }
                 }
             });
+        }
+
+        if (actionButtonsColor != 0) {
+            Button neutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            if (neutral != null) {
+                neutral.setTextColor(actionButtonsColor);
+            }
+
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (positive != null) {
+                positive.setTextColor(actionButtonsColor);
+            }
+
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            if (negative != null) {
+                negative.setTextColor(actionButtonsColor);
+            }
         }
     }
 
@@ -811,8 +833,15 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
         boolean showSelectButton;
 
+        int actionButtonsColor;
+
         /*package*/ Builder() {
 
+        }
+
+        public Builder setActionButtonsColor(int actionButtonsColor) {
+            this.actionButtonsColor = actionButtonsColor;
+            return this;
         }
 
         public Builder setPositiveTitle(int positiveTitle) {
@@ -980,6 +1009,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
             args.putInt(ARG_NEUTRAL_CUSTOM_TITLE, neutralCustomTitle);
             args.putBoolean(ARG_SHOW_SELECT, showSelectButton);
             args.putInt(ARG_CONTENT_MESSAGE, contentMessage);
+            args.putInt(ARG_ACTION_BUTTONS_COLOR, actionButtonsColor);
             dialog.setArguments(args);
             return dialog;
         }
