@@ -81,7 +81,8 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
     private static final String ARG_POSITIVE_TITLE = "positiveTitle";
     private static final String ARG_NEGATIVE_TITLE = "negativeTitle";
-    private static final String ARG_NEUTRAL_TITLE = "neutralTitle";
+    private static final String ARG_NEUTRAL_PRESETS_TITLE = "neutralPresetsTitle";
+    private static final String ARG_NEUTRAL_CUSTOM_TITLE = "neutralCustomTitle";
     private static final String ARG_SHOW_SELECT = "showSelect";
     private static final String ARG_CONTENT_MESSAGE = "contentMessage";
 
@@ -151,7 +152,9 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
     @StringRes
     int positiveTitle;
     @StringRes
-    int neutralTitle;
+    int neutralPresetsTitle;
+    @StringRes
+    int neutralCustomTitle;
     @StringRes
     int negativeTitle;
     @StringRes
@@ -185,7 +188,8 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
         positiveTitle = getArguments().getInt(ARG_POSITIVE_TITLE);
         negativeTitle = getArguments().getInt(ARG_NEGATIVE_TITLE);
-        neutralTitle = getArguments().getInt(ARG_NEUTRAL_TITLE);
+        neutralPresetsTitle = getArguments().getInt(ARG_NEUTRAL_PRESETS_TITLE);
+        neutralCustomTitle = getArguments().getInt(ARG_NEUTRAL_CUSTOM_TITLE);
         showSelectButton = getArguments().getBoolean(ARG_SHOW_SELECT);
         contentMessage = getArguments().getInt(ARG_CONTENT_MESSAGE);
 
@@ -226,9 +230,9 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
         int neutralButtonStringRes;
         if (dialogType == TYPE_CUSTOM && getArguments().getBoolean(ARG_ALLOW_PRESETS)) {
-            neutralButtonStringRes = R.string.cpv_presets;
+            neutralButtonStringRes = neutralPresetsTitle != 0 ? neutralPresetsTitle : R.string.cpv_presets;
         } else if (dialogType == TYPE_PRESETS && getArguments().getBoolean(ARG_ALLOW_CUSTOM)) {
-            neutralButtonStringRes = R.string.cpv_custom;
+            neutralButtonStringRes = neutralCustomTitle != 0 ? neutralCustomTitle : R.string.cpv_custom;
         } else {
             neutralButtonStringRes = 0;
         }
@@ -245,9 +249,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
                 }
             });
         }
-        if (neutralTitle != 0) {
-            builder.setNeutralButton(neutralTitle, null);
-        }
+
         if (negativeTitle != 0) {
             builder.setNegativeButton(negativeTitle, null);
         }
@@ -276,12 +278,12 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
                     switch (dialogType) {
                         case TYPE_CUSTOM:
                             dialogType = TYPE_PRESETS;
-                            ((Button) v).setText(R.string.cpv_custom);
+                            ((Button) v).setText(neutralCustomTitle != 0 ? neutralCustomTitle : R.string.cpv_custom);
                             rootView.addView(createPresetsView());
                             break;
                         case TYPE_PRESETS:
                             dialogType = TYPE_CUSTOM;
-                            ((Button) v).setText(R.string.cpv_presets);
+                            ((Button) v).setText(neutralPresetsTitle != 0 ? neutralPresetsTitle : R.string.cpv_presets);
                             rootView.addView(createPickerView());
                     }
                 }
@@ -502,7 +504,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         adapter = new ColorPaletteAdapter(new ColorPaletteAdapter.OnColorSelectedListener() {
             @Override
             public void onColorSelected(int newColor) {
-                if(showSelectButton == false){
+                if (showSelectButton == false) {
                     color = newColor;
                 }
 
@@ -799,7 +801,9 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         @StringRes
         int positiveTitle;
         @StringRes
-        int neutralTitle;
+        int neutralPresetsTitle;
+        @StringRes
+        int neutralCustomTitle;
         @StringRes
         int negativeTitle;
         @StringRes
@@ -821,8 +825,13 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
             return this;
         }
 
-        public Builder setNeutralTitle(int neutralTitle) {
-            this.neutralTitle = neutralTitle;
+        public Builder setNeutralPresetsTitle(int neutralTitle) {
+            this.neutralPresetsTitle = neutralTitle;
+            return this;
+        }
+
+        public Builder setNeutralCustomTitle(int neutralTitle) {
+            this.neutralCustomTitle = neutralTitle;
             return this;
         }
 
@@ -967,7 +976,8 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
             args.putInt(ARG_COLOR_SHAPE, colorShape);
             args.putInt(ARG_POSITIVE_TITLE, positiveTitle);
             args.putInt(ARG_NEGATIVE_TITLE, negativeTitle);
-            args.putInt(ARG_NEUTRAL_TITLE, neutralTitle);
+            args.putInt(ARG_NEUTRAL_PRESETS_TITLE, neutralPresetsTitle);
+            args.putInt(ARG_NEUTRAL_CUSTOM_TITLE, neutralCustomTitle);
             args.putBoolean(ARG_SHOW_SELECT, showSelectButton);
             args.putInt(ARG_CONTENT_MESSAGE, contentMessage);
             dialog.setArguments(args);
