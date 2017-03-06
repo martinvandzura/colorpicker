@@ -15,7 +15,7 @@
             android:id="@+id/contentMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="0dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:textColor="?android:textColorSecondary"
@@ -27,14 +27,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="16dp"
             android:cacheColorHint="@android:color/transparent"
             android:clickable="false"
             android:columnWidth="@dimen/cpv_column_width"
             android:horizontalSpacing="4dp"
             android:listSelector="@android:color/transparent"
-            android:numColumns="5"
-            android:stretchMode="none"
+            android:numColumns="auto_fit"
+            android:stretchMode="spacingWidth"
             android:verticalSpacing="8dp"/>
 
         <View
