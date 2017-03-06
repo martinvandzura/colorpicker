@@ -25,6 +25,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
+
 import com.jrummyapps.android.colorpicker.ColorPickerDialog.DialogType;
 
 /**
@@ -104,6 +105,7 @@ public class ColorPreference extends Preference implements ColorPickerDialogList
           .setShowAlphaSlider(showAlphaSlider)
           .setShowColorShades(showColorShades)
           .setColor(color)
+              .setShowSelectButton(false).setContentMessage(R.string.cpv_custom).setDialogTitle(R.string.cpv_presets).setShowColorShades(false).setNeutralTitle(R.string.cpv_transparency)
           .create();
       dialog.setColorPickerDialogListener(ColorPreference.this);
       Activity activity = (Activity) getContext();
