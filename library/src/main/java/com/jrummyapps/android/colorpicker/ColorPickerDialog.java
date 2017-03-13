@@ -194,7 +194,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         negativeTitle = getArguments().getInt(ARG_NEGATIVE_TITLE);
         neutralPresetsTitle = getArguments().getInt(ARG_NEUTRAL_PRESETS_TITLE);
         neutralCustomTitle = getArguments().getInt(ARG_NEUTRAL_CUSTOM_TITLE);
-        showSelectButton = getArguments().getBoolean(ARG_SHOW_SELECT);
+        showSelectButton = getArguments().getBoolean(ARG_SHOW_SELECT, true);
         contentMessage = getArguments().getInt(ARG_CONTENT_MESSAGE);
         actionButtonsColor = getArguments().getInt(ARG_ACTION_BUTTONS_COLOR);
 
@@ -246,26 +246,40 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
             builder.setNeutralButton(neutralButtonStringRes, null);
         }
 
-        if (positiveTitle != 0 && showSelectButton) {
-            builder.setPositiveButton(positiveTitle, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    colorPickerDialogListener.onColorSelected(dialogId, color);
-                }
-            });
+        if (positiveTitle == 0) {
+            positiveTitle = R.string.cpv_select;
         }
+
+        builder.setPositiveButton(positiveTitle, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                colorPickerDialogListener.onColorSelected(dialogId, color);
+            }
+        });
 
         if (negativeTitle != 0) {
             builder.setNegativeButton(negativeTitle, null);
         }
 
-        return builder.create();
+        AlertDialog dialog = builder.create();
+
+
+        return dialog;
+    }
+
+    private void updateSelectButtonVisibility(AlertDialog dialog) {
+        if (positiveTitle != 0 && showSelectButton || (dialogType == TYPE_CUSTOM)) {
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.VISIBLE);
+        } else {
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.GONE);
+        }
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        AlertDialog dialog = (AlertDialog) getDialog();
+        final AlertDialog dialog = (AlertDialog) getDialog();
 
         // http://stackoverflow.com/a/16972670/1048340
         //noinspection ConstantConditions
@@ -285,11 +299,13 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
                             dialogType = TYPE_PRESETS;
                             ((Button) v).setText(neutralCustomTitle != 0 ? neutralCustomTitle : R.string.cpv_custom);
                             rootView.addView(createPresetsView());
+                            updateSelectButtonVisibility(dialog);
                             break;
                         case TYPE_PRESETS:
                             dialogType = TYPE_CUSTOM;
                             ((Button) v).setText(neutralPresetsTitle != 0 ? neutralPresetsTitle : R.string.cpv_presets);
                             rootView.addView(createPickerView());
+                            updateSelectButtonVisibility(dialog);
                     }
                 }
             });
@@ -311,6 +327,8 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
                 negative.setTextColor(actionButtonsColor);
             }
         }
+
+        updateSelectButtonVisibility(dialog);
     }
 
     @Override
