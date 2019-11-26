@@ -397,12 +397,10 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         ImageView arrowRight = (ImageView) contentView.findViewById(R.id.cpv_arrow_right);
         hexEditText = (EditText) contentView.findViewById(R.id.cpv_hex);
         if (textColor != 0) {
+            colorPicker.setBorderColor(textColor);
+            oldColorPanel.setBorderColor(textColor);
+            newColorPanel.setBorderColor(textColor);
             arrowRight.setImageResource(R.drawable.cpv_ic_arrow_right_white_24dp);
-            if (Build.VERSION.SDK_INT >= 21) {
-                arrowRight.setImageTintList(ColorStateList.valueOf(textColor));
-            } else {
-                android.support.v4.view.ViewCompat.setBackgroundTintList(arrowRight, ColorStateList.valueOf(textColor));
-            }
             hexEditText.setTextColor(textColor);
             TextView hash = (TextView) contentView.findViewById(R.id.cpv_hash);
             hash.setTextColor(textColor);
@@ -412,7 +410,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
             final TypedValue value = new TypedValue();
             TypedArray typedArray =
                     getActivity().obtainStyledAttributes(value.data, new int[]{android.R.attr.textColorPrimary});
-            int arrowColor = typedArray.getColor(0, Color.BLACK);
+            int arrowColor = textColor != 0 ? textColor : typedArray.getColor(0, Color.BLACK);
             typedArray.recycle();
             arrowRight.setColorFilter(arrowColor);
         } catch (Exception ignored) {
@@ -904,7 +902,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
         }
 
-        public Builder setbackgroundColor(int backgroundColor) {
+        public Builder setBackgroundColor(int backgroundColor) {
             this.backgroundColor = backgroundColor;
             return this;
         }
