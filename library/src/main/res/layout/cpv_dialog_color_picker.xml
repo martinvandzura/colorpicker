@@ -62,6 +62,7 @@
           tools:ignore="RtlHardcoded">
 
         <TextView
+            android:id="@+id/cpv_hash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="#"

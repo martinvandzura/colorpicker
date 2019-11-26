@@ -21,9 +21,12 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
@@ -33,7 +36,10 @@ import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -86,6 +92,8 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
     private static final String ARG_SHOW_SELECT = "showSelect";
     private static final String ARG_CONTENT_MESSAGE = "contentMessage";
     private static final String ARG_ACTION_BUTTONS_COLOR = "actionButtonsColor";
+    private static final String ARG_TEXT_COLOR = "textColor";
+    private static final String ARG_BACKGROUND_COLOR = "backgroundColor";
 
     public static final int TYPE_CUSTOM = 0;
     public static final int TYPE_PRESETS = 1;
@@ -163,6 +171,10 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
     @ColorInt
     int actionButtonsColor;
+    @ColorInt
+    int textColor;
+    @ColorInt
+    int backgroundColor;
 
     TextView conntentMessageView;
 
@@ -197,6 +209,11 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         showSelectButton = getArguments().getBoolean(ARG_SHOW_SELECT, true);
         contentMessage = getArguments().getInt(ARG_CONTENT_MESSAGE);
         actionButtonsColor = getArguments().getInt(ARG_ACTION_BUTTONS_COLOR);
+        textColor = getArguments().getInt(ARG_TEXT_COLOR);
+        backgroundColor = getArguments().getInt(ARG_BACKGROUND_COLOR);
+        if (actionButtonsColor == 0 && textColor != 0) {
+            actionButtonsColor = textColor;
+        }
 
         rootView = new FrameLayout(getActivity());
         if (dialogType == TYPE_CUSTOM) {
@@ -230,7 +247,21 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
         int dialogTitleStringRes = getArguments().getInt(ARG_DIALOG_TITLE);
         if (dialogTitleStringRes != 0) {
-            builder.setTitle(dialogTitleStringRes);
+            if (textColor != 0) {
+                CharSequence titleText = getString(dialogTitleStringRes);
+                ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(textColor);
+                SpannableStringBuilder ssBuilder = new SpannableStringBuilder(titleText);
+                ssBuilder.setSpan(
+                        foregroundColorSpan,
+                        0,
+                        titleText.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+
+                builder.setTitle(ssBuilder);
+            } else {
+                builder.setTitle(dialogTitleStringRes);
+            }
         }
 
         int neutralButtonStringRes;
@@ -263,6 +294,9 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
 
         AlertDialog dialog = builder.create();
 
+        if (backgroundColor != 0 && dialog.getWindow() != null && dialog.getWindow().getDecorView() != null) {
+            dialog.getWindow().getDecorView().getBackground().setColorFilter(new LightingColorFilter(0xFF000000, backgroundColor));
+        }
 
         return dialog;
     }
@@ -362,6 +396,17 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         newColorPanel = (ColorPanelView) contentView.findViewById(R.id.cpv_color_panel_new);
         ImageView arrowRight = (ImageView) contentView.findViewById(R.id.cpv_arrow_right);
         hexEditText = (EditText) contentView.findViewById(R.id.cpv_hex);
+        if (textColor != 0) {
+            arrowRight.setImageResource(R.drawable.cpv_ic_arrow_right_white_24dp);
+            if (Build.VERSION.SDK_INT >= 21) {
+                arrowRight.setImageTintList(ColorStateList.valueOf(textColor));
+            } else {
+                android.support.v4.view.ViewCompat.setBackgroundTintList(arrowRight, ColorStateList.valueOf(textColor));
+            }
+            hexEditText.setTextColor(textColor);
+            TextView hash = (TextView) contentView.findViewById(R.id.cpv_hash);
+            hash.setTextColor(textColor);
+        }
 
         try {
             final TypedValue value = new TypedValue();
@@ -558,7 +603,7 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
                     createColorShades(color);
                 }
             }
-        }, presets, getSelectedItemPosition(), colorShape);
+        }, presets, getSelectedItemPosition(), colorShape, textColor);
 
         gridView.setAdapter(adapter);
 
@@ -852,9 +897,21 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
         boolean showSelectButton;
 
         int actionButtonsColor;
+        int textColor;
+        int backgroundColor;
 
         /*package*/ Builder() {
 
+        }
+
+        public Builder setbackgroundColor(int backgroundColor) {
+            this.backgroundColor = backgroundColor;
+            return this;
+        }
+
+        public Builder setTextColor(int textColor) {
+            this.textColor = textColor;
+            return this;
         }
 
         public Builder setActionButtonsColor(int actionButtonsColor) {
@@ -1028,6 +1085,8 @@ public class ColorPickerDialog extends DialogFragment implements OnTouchListener
             args.putBoolean(ARG_SHOW_SELECT, showSelectButton);
             args.putInt(ARG_CONTENT_MESSAGE, contentMessage);
             args.putInt(ARG_ACTION_BUTTONS_COLOR, actionButtonsColor);
+            args.putInt(ARG_TEXT_COLOR, textColor);
+            args.putInt(ARG_BACKGROUND_COLOR, backgroundColor);
             dialog.setArguments(args);
             return dialog;
         }
